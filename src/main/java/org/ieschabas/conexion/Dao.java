@@ -1,114 +1,64 @@
 package org.ieschabas.conexion;
 
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
+
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.List;
 
-public abstract class Dao {
-    //Conexión con la base de datos:
-    
+public class Dao <T> {
+    private final Class<T> clase;
+    //Conexión con la base de datos:e
+    private static final Configuration cfg = new Configuration().configure("hibernate.cfg.xml");
+    private final SessionFactory sf;
+    private Session session;
+
     /**
      * Constructor de la superclase abstracta gestor:
      */
-    public Dao(){}
-    public Statement conectar() throws SQLException {
-        //Carga el controlador (opcional para versiones recientes:
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-        //Se crea la conexión:
-        conexion = DriverManager.getConnection(HOST, NOMBRE, CONTRASENYA);
-        //Se selecciona la base de datos, se puede hacer con el USE de sql o también con:
-        conexion.setCatalog("ferrocarril");
-        //Se crea un Statement que sirve para comunicarse con la BD y enviarle instrucciones:
-        statement = conexion.createStatement();
-        //Los Statements (o extractos) pueden ser de lectura (consultas) con executeQuery()
-        // o de sentencias DML de escritura con executeUpdate() (insertar, modificar o eliminar), así como DDL o DCL.
-        return statement;
-    }
-    public ResultSet leerBaseDatos(String instruccion) throws SQLException{
-        //En el caso de las consultas, el statement devuelve un objeto de tipo ResultSet, que sería un objeto como de tipo consulta:
-        consulta = conectar().executeQuery(instruccion);
-        return consulta;
+    public Dao(Class<T> clase) {
+        this.clase = clase;
+        sf = cfg.buildSessionFactory();
     }
 
-    public void escribirBaseDatos(String instruccion) throws SQLException{
-        conectar().executeUpdate(instruccion);
+    private void setUp(){
+        session = sf.openSession();
+        session.beginTransaction();
     }
-    public void closeQuery() throws SQLException {
-        consulta.close();
-    }
-    public void desconectar() throws SQLException {
-        statement.close();
-        conexion.close();
+    private void dispose(){
+        session.getTransaction().commit();
+        session.close();
     }
 
-    //////////////////////////////////////Métodos abstractos////////////////////////////////////////////////////////////////
-
-    /**
-     * Método para crear una tabla en la base de datos
-     * SQL: sentencia CREATE TABLE
-     * @author Antonio Mas Esteve
-     * @return boolean
-     * @throws SQLException Error de ejecución SQL
-     */
-    public abstract boolean crearTabla() throws SQLException;
-
-    /**
-     * Método que elimina una tabla de la base de datos seleccionada
-     * SQL: sentencia DROP TABLE
-     * @author Antonio Mas Esteve
-     * @return boolean
-     * @throws SQLException Error de ejecución SQL
-     */
-    public abstract boolean eliminarTabla() throws SQLException;
-    /**
-     * Método para listar las distintas tablas de las bases de datos y almacenarlas en una lista.
-     * Como no se necesitan restricciones, usamos ArrayList.
-     * SQL: sentencia SELECT
-     * @author Antonio Mas Esteve
-     * @return ArrayList
-     * @throws SQLException Error de ejecución SQL
-     */
-    public abstract ArrayList<?> listar() throws SQLException;
-
-    /**
-     * Busca un registro concreto en una tabla cualquiera y devuelve su objeto correspondiente.
-     * SQL: sentencia: SELECT
-     * @author Antonio Mas Esteve
-     * @return Object
-     * @throws SQLException Error de ejecución SQL
-     */
-    public abstract Object buscar(String id) throws SQLException;
-
-    /**
-     * Método para insertar objetos en la base de datos. Devuelve si se ha hecho bien o no
-     * @author Antonio Mas Esteve
-     * SQL sentencia INSERT
-     * @return boolean
-     * @throws SQLException Error de ejecución SQL
-     */
-    public abstract boolean insertar(Object obj) throws SQLException;
-
-    /**
-     * Método para modificar un registro de la tabla. Devuelve si está hecho o no
-     * @author Antonio Mas Esteve
-     * SQL sentencia UPDATE
-     * @return boolean
-     * @throws SQLException Error de ejecución SQL
-     */
-    public abstract boolean modificar(Object obj) throws SQLException;
-
-    /**
-     * Método para eliminar un registro según si Id.
-     * SQL sentencia DELETE
-     * @return boolean
-     * @throws SQLException Error de ejecución SQL
-     */
-    public abstract boolean eliminar(String id) throws SQLException;
-
-
-
+    public boolean insertar(T entidad){
+        setUp();
+        session.merge(entidad);
+        dispose();
+        return true;
+    }
+    public T buscar(String id){
+        T entidad;
+        setUp();
+        entidad = session.get(clase, id);
+        dispose();
+        return entidad;
+    }
+    public boolean eliminar(String id){
+        //Buscamos primero la entidad.
+     T entidad = buscar(id);
+     setUp();
+     session.remove(entidad);
+     dispose();
+     return true;
+    }
+    public List<T> listar(){
+        List<T> lista = new ArrayList<>();
+        setUp();
+        lista = session.createQuery("FROM "+clase.getName(), clase).list();
+        dispose();
+        return lista;
+    }
 
 }

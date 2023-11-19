@@ -1,45 +1,58 @@
 package org.ieschabas.models;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import jakarta.persistence.*;
+@Entity
+@Table(name = "mantenimiento")
 public class Mantenimiento {
-    private String id;
-    private String tren_id;
-    private String empleado_id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column
+    private int id;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "tren_id", referencedColumnName = "id")
+    private Tren tren;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "empleado_id", referencedColumnName = "id")
+    private Empleado empleado;
+    @Column
     private String inicio;
+    @Column
     private String fin;
+    @Column
     private String descripcion;
     public Mantenimiento(){}
 
-    public Mantenimiento(String id, String tren_id, String empleado_id, String inicio, String fin, String descripcion) {
-        this.id = id;
-        this.tren_id = tren_id;
-        this.empleado_id = empleado_id;
+    public Mantenimiento(Tren tren, Empleado empleado, String inicio, String fin, String descripcion) {
+        this.tren = tren;
+        this.empleado = empleado;
         this.inicio = inicio;
         this.fin = fin;
         this.descripcion = descripcion;
     }
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 
-    public String getTren_id() {
-        return tren_id;
+    public Tren getTren() {
+        return tren;
     }
 
-    public void setTren_id(String tren_id) {
-        this.tren_id = tren_id;
+    public void setTren(Tren tren) {
+        this.tren = tren;
     }
 
-    public String getEmpleado_id() {
-        return empleado_id;
+    public Empleado getEmpleado() {
+        return empleado;
     }
 
-    public void setEmpleado_id(String empleado_id) {
-        this.empleado_id = empleado_id;
+    public void setEmpleado(Empleado empleado) {
+        this.empleado = empleado;
     }
 
     public String getInicio() {
@@ -68,13 +81,23 @@ public class Mantenimiento {
 
     @Override
     public String toString() {
-        return "Mantenimiento{" +
-                "id='" + id + '\'' +
-                ", tren_id='" + tren_id + '\'' +
-                ", empleado_id='" + empleado_id + '\'' +
-                ", inicio='" + inicio + '\'' +
-                ", fin='" + fin + '\'' +
-                ", descripcion='" + descripcion + '\'' +
+        return "{" +
+                "'id':'" + id + '\'' +
+                ", 'tren':'" + tren.toString() + '\'' +
+                ", 'empleado':'" + empleado.toString() + '\'' +
+                ", 'inicio':'" + inicio + '\'' +
+                ", 'fin':'" + fin + '\'' +
+                ", 'descripcion':'" + descripcion + '\'' +
                 '}';
+    }
+    public static Mantenimiento fromJson(JsonNode node){
+        Mantenimiento mantenimiento = new Mantenimiento();
+        if(node.has("id")) mantenimiento.setId(node.get("id").asInt());
+        if(node.has("inicio")) mantenimiento.setInicio(node.get("inicio").asText());
+        if(node.has("fin")) mantenimiento.setFin(node.get("fin").asText());
+        if(node.has("descripcion")) mantenimiento.setDescripcion(node.get("descripcion").asText());
+        if(node.has("tren")) mantenimiento.setTren(Tren.fromJson(node.get("tren")));
+        if(node.has("empleado")) mantenimiento.setEmpleado(Empleado.fromJson(node.get("empleado")));
+        return mantenimiento;
     }
 }

@@ -1,26 +1,38 @@
 package org.ieschabas.models;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "empleado")
 public class Empleado {
-    private String id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column
+    private int id;
+    @Column
     private String nombre;
+    @Column
     private String puesto;
+    @Column
     private String contratado;
-    private String estacion_id;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "estacion_id", referencedColumnName = "id")
+    private Estacion estacion;
     public Empleado(){}
 
-    public Empleado(String id, String nombre, String puesto, String contratado, String estacion_id) {
-        this.id = id;
+    public Empleado(String nombre, String puesto, String contratado, Estacion estacion) {
         this.nombre = nombre;
         this.puesto = puesto;
         this.contratado = contratado;
-        this.estacion_id = estacion_id;
+        this.estacion = estacion;
     }
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -48,22 +60,32 @@ public class Empleado {
         this.contratado = contratado;
     }
 
-    public String getEstacion_id() {
-        return estacion_id;
+    public Estacion getEstacion() {
+        return estacion;
     }
 
-    public void setEstacion_id(String estacion_id) {
-        this.estacion_id = estacion_id;
+    public void setEstacion(Estacion estacion) {
+        this.estacion = estacion;
     }
 
     @Override
     public String toString() {
-        return "Empleado{" +
-                "id='" + id + '\'' +
-                ", nombre='" + nombre + '\'' +
-                ", puesto='" + puesto + '\'' +
-                ", contratado='" + contratado + '\'' +
-                ", estacion_id='" + estacion_id + '\'' +
+        return "{" +
+                "'id':'" + id + '\'' +
+                ", 'nombre':'" + nombre + '\'' +
+                ", 'puesto':'" + puesto + '\'' +
+                ", 'contratado':'" + contratado + '\'' +
+                ", 'estacion':'" + estacion.toString() + '\'' +
                 '}';
+    }
+    public static Empleado fromJson(JsonNode node){
+        Empleado empleado = new Empleado();
+        if(node.has("id")) empleado.setId(node.get("id").asInt());
+        if(node.has("nombre")) empleado.setNombre(node.get("nombre").asText());
+        if(node.has("puesto")) empleado.setPuesto(node.get("puesto").asText());
+        if(node.has("contratado")) empleado.setContratado(node.get("contratado").asText());
+        //Cuando es un objeto llamamos a su propio método fromJson:
+        if(node.has("estacion")) empleado.setEstacion(Estacion.fromJson(node.get("estacion")));
+        return empleado;
     }
 }

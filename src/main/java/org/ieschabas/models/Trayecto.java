@@ -1,53 +1,68 @@
 package org.ieschabas.models;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "trayecto")
 public class Trayecto {
-    private String id;
-    private String tren_id;
-    private String estacion_id_salida;
-    private String estacion_id_llegada;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column
+    private int id;
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "tren_id")
+    private Tren tren;
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "estacion_id_salida")
+    private Estacion estacion1;
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "estacion_id_llegada")
+    private Estacion estacion2;
+    @Column
     private String fecha;
+    @Column
     private String hora;
     public Trayecto(){}
 
-    public Trayecto(String id, String tren_id, String estacion_id_salida, String estacion_id_llegada, String fecha, String hora) {
-        this.id = id;
-        this.tren_id = tren_id;
-        this.estacion_id_salida = estacion_id_salida;
-        this.estacion_id_llegada = estacion_id_llegada;
+    public Trayecto(Tren tren, Estacion estacion1, Estacion estacion2, String fecha, String hora) {
+        this.tren = tren;
+        this.estacion1 = estacion1;
+        this.estacion2 = estacion2;
         this.fecha = fecha;
         this.hora = hora;
     }
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 
-    public String getTren_id() {
-        return tren_id;
+    public Tren getTren() {
+        return tren;
     }
 
-    public void setTren_id(String tren_id) {
-        this.tren_id = tren_id;
+    public void setTren(Tren tren) {
+        this.tren = tren;
     }
 
-    public String getEstacion_id_salida() {
-        return estacion_id_salida;
+    public Estacion getEstacion1() {
+        return estacion1;
     }
 
-    public void setEstacion_id_salida(String estacion_id_salida) {
-        this.estacion_id_salida = estacion_id_salida;
+    public void setEstacion1(Estacion estacion1) {
+        this.estacion1 = estacion1;
     }
 
-    public String getEstacion_id_llegada() {
-        return estacion_id_llegada;
+    public Estacion getEstacion2() {
+        return estacion2;
     }
 
-    public void setEstacion_id_llegada(String estacion_id_llegada) {
-        this.estacion_id_llegada = estacion_id_llegada;
+    public void setEstacion2(Estacion estacion2) {
+        this.estacion2 = estacion2;
     }
 
     public String getFecha() {
@@ -68,13 +83,23 @@ public class Trayecto {
 
     @Override
     public String toString() {
-        return "Trayecto{" +
-                "id='" + id + '\'' +
-                ", tren_id='" + tren_id + '\'' +
-                ", estacion_id_salida='" + estacion_id_salida + '\'' +
-                ", estacion_id_llegada='" + estacion_id_llegada + '\'' +
-                ", fecha='" + fecha + '\'' +
-                ", hora='" + hora + '\'' +
+        return "{" +
+                "'id':'" + id + '\'' +
+                ", 'tren':'" + tren.toString() + '\'' +
+                ", 'estacion1':'" + estacion1.toString() + '\'' +
+                ", 'estacion2':'" + estacion2.toString() + '\'' +
+                ", 'fecha':'" + fecha + '\'' +
+                ", 'hora':'" + hora + '\'' +
                 '}';
+    }
+    public static Trayecto fromJson(JsonNode node){
+        Trayecto trayecto = new Trayecto();
+        if(node.has("id")) trayecto.setId(node.get("id").asInt());
+        if(node.has("fecha")) trayecto.setFecha(node.get("fecha").asText());
+        if(node.has("hora")) trayecto.setHora(node.get("hora").asText());
+        if(node.has("tren")) trayecto.setTren(Tren.fromJson(node.get("tren")));
+        if(node.has("estacion1")) trayecto.setEstacion1(Estacion.fromJson(node.get("estacion1")));
+        if(node.has("estacion2")) trayecto.setEstacion2(Estacion.fromJson(node.get("estacion2")));
+        return trayecto;
     }
 }

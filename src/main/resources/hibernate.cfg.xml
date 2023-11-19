@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+    <session-factory>
+        <!--Conexion-->
+        <property name="hibernate.connection.driver_class">com.mysql.cj.jdbc.Driver</property>
+        <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/ferrocarril</property>
+        <property name="hibernate.connection.username">root</property>
+        <property name="hibernate.connection.password">0385</property>
+        <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+        <!--Para que muestre las sentencias en el log-->
+        <property name="show_sql">true</property>
+        <property name="format_sql">true</property>
+        <!--modo de actuar sobre la base de datos. Actualizar, pero no crear nuevo-->
+        <property name="hbm2ddl.auto">update</property>
+        <!--Clases a mapear-->
+        <mapping class="org.ieschabas.models.Tren"/>
+        <mapping class="org.ieschabas.models.Estacion"/>
+        <mapping class="org.ieschabas.models.Empleado"/>
+        <mapping class="org.ieschabas.models.Mantenimiento"/>
+        <mapping class="org.ieschabas.models.Trayecto"/>
+        <mapping class="org.ieschabas.models.Pasajero"/>
+    </session-factory>
+</hibernate-configuration>
