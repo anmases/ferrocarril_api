@@ -1,6 +1,8 @@
 package org.ieschabas.models;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.*;
 
 @Entity
@@ -70,13 +72,13 @@ public class Empleado {
 
     @Override
     public String toString() {
-        return "{" +
-                "'id':'" + id + '\'' +
-                ", 'nombre':'" + nombre + '\'' +
-                ", 'puesto':'" + puesto + '\'' +
-                ", 'contratado':'" + contratado + '\'' +
-                ", 'estacion':'" + estacion.toString() + '\'' +
-                '}';
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            return mapper.writeValueAsString(this);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return "{}";
+        }
     }
     public static Empleado fromJson(JsonNode node){
         Empleado empleado = new Empleado();

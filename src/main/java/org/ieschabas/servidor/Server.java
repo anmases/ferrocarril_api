@@ -27,6 +27,7 @@ public class Server extends WebSocketServer {
 
     @Override
     public void onMessage(WebSocket ws, String message)  {
+        System.out.println(message);
         ObjectMapper mapper = new ObjectMapper();
         try {
             JsonNode root = mapper.readTree(message);

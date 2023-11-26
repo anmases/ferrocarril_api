@@ -27,9 +27,10 @@ final Dao<Tren> daoTren = new Dao<>(Tren.class);
 
     @Test
     void buscar() {
-        Tren tren = daoTren.buscar("1");
+        Tren tren = daoTren.buscar("3");
         System.out.println(tren.toString());
         assertEquals(tren.getModelo(), "Euromed");
+        assertEquals(tren.getCapacidad(), 450);
     }
 
     @Test

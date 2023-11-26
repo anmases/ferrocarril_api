@@ -54,7 +54,7 @@ public class Dao <T> {
      return true;
     }
     public List<T> listar(){
-        List<T> lista = new ArrayList<>();
+        List<T> lista;
         setUp();
         lista = session.createQuery("FROM "+clase.getName(), clase).list();
         dispose();

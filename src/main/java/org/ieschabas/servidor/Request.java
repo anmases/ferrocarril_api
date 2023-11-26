@@ -41,6 +41,7 @@ public class Request {
         }
     }
     public boolean post(String type, JsonNode data){
+        System.out.println(data.toPrettyString());
         switch (type.toLowerCase()){
             case "tren":
                 return daoTren.insertar(Tren.fromJson(data));

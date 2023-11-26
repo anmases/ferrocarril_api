@@ -1,6 +1,8 @@
 package org.ieschabas.models;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.*;
 
 @Entity
@@ -83,14 +85,13 @@ public class Trayecto {
 
     @Override
     public String toString() {
-        return "{" +
-                "'id':'" + id + '\'' +
-                ", 'tren':'" + tren.toString() + '\'' +
-                ", 'estacion1':'" + estacion1.toString() + '\'' +
-                ", 'estacion2':'" + estacion2.toString() + '\'' +
-                ", 'fecha':'" + fecha + '\'' +
-                ", 'hora':'" + hora + '\'' +
-                '}';
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            return mapper.writeValueAsString(this);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return "{}";
+        }
     }
     public static Trayecto fromJson(JsonNode node){
         Trayecto trayecto = new Trayecto();

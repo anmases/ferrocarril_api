@@ -1,6 +1,8 @@
 package org.ieschabas.models;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.*;
 
 @Entity
@@ -45,11 +47,13 @@ public class Tren{
 
     @Override
     public String toString() {
-        return "{" +
-                "'id':'" + id + '\'' +
-                ", 'modelo':'" + modelo + '\'' +
-                ", 'capacidad':'" + capacidad + '\'' +
-                '}';
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            return mapper.writeValueAsString(this);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return "{}";
+        }
     }
 
     public static Tren fromJson(JsonNode node){
